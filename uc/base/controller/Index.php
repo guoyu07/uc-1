@@ -8,7 +8,7 @@ class Index extends Controller
     public function index()
     {
         echo '123';
-        $this->fetch();
+        //$this->fetch();
     }
 
 }

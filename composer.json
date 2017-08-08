@@ -2,7 +2,8 @@
     "require": {
         "symfony/var-dumper": "^3.3",
         "filp/whoops": "^2.1",
-        "aura/router":"^2.3.1"
+        "symfony/routing": "^3.3",
+        "nette/http":"^2.3.9"
     },
     "autoload": {
         "psr-4": {
