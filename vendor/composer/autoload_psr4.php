@@ -6,8 +6,12 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
+    'ucframework\\' => array($baseDir . '/ucframework'),
+    'uc\\' => array($baseDir . '/uc'),
     'Whoops\\' => array($vendorDir . '/filp/whoops/src/Whoops'),
     'Symfony\\Polyfill\\Mbstring\\' => array($vendorDir . '/symfony/polyfill-mbstring'),
     'Symfony\\Component\\VarDumper\\' => array($vendorDir . '/symfony/var-dumper'),
     'Psr\\Log\\' => array($vendorDir . '/psr/log/Psr/Log'),
+    'Aura\\Router\\_Config\\' => array($vendorDir . '/aura/router/config'),
+    'Aura\\Router\\' => array($vendorDir . '/aura/router/src'),
 );

@@ -241,5 +241,61 @@
             "whoops",
             "zf2"
         ]
+    },
+    {
+        "name": "aura/router",
+        "version": "2.3.1",
+        "version_normalized": "2.3.1.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/auraphp/Aura.Router.git",
+            "reference": "d8cb21b7fa8d2b2ae874093d5440688b3356f9c4"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://files.phpcomposer.com/files/auraphp/Aura.Router/d8cb21b7fa8d2b2ae874093d5440688b3356f9c4.zip",
+            "reference": "d8cb21b7fa8d2b2ae874093d5440688b3356f9c4",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.3.0"
+        },
+        "require-dev": {
+            "aura/di": "~2.0"
+        },
+        "time": "2016-10-03 20:00:15",
+        "type": "library",
+        "extra": {
+            "aura": {
+                "type": "library",
+                "config": {
+                    "common": "Aura\\Router\\_Config\\Common"
+                }
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "Aura\\Router\\": "src/",
+                "Aura\\Router\\_Config\\": "config/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "BSD-2-Clause"
+        ],
+        "authors": [
+            {
+                "name": "Aura.Router Contributors",
+                "homepage": "https://github.com/auraphp/Aura.Router/contributors"
+            }
+        ],
+        "description": "A web router implementation; given a URI path and a copy of $_SERVER, it will extract path-info parameter values for a specific route.",
+        "homepage": "https://github.com/auraphp/Aura.Router",
+        "keywords": [
+            "route",
+            "router",
+            "routing"
+        ]
     }
 ]

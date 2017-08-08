@@ -4,9 +4,63 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "af2be6b66d2ddcf24020bdc9662b8fcb",
-    "content-hash": "907188961b4d9cdc88b412120316a450",
+    "hash": "ed1e2cd0757f52a5399f07295f0e8471",
+    "content-hash": "9facbe5008361d4987375503d3924292",
     "packages": [
+        {
+            "name": "aura/router",
+            "version": "2.3.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/auraphp/Aura.Router.git",
+                "reference": "d8cb21b7fa8d2b2ae874093d5440688b3356f9c4"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://files.phpcomposer.com/files/auraphp/Aura.Router/d8cb21b7fa8d2b2ae874093d5440688b3356f9c4.zip",
+                "reference": "d8cb21b7fa8d2b2ae874093d5440688b3356f9c4",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "require-dev": {
+                "aura/di": "~2.0"
+            },
+            "type": "library",
+            "extra": {
+                "aura": {
+                    "type": "library",
+                    "config": {
+                        "common": "Aura\\Router\\_Config\\Common"
+                    }
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Aura\\Router\\": "src/",
+                    "Aura\\Router\\_Config\\": "config/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-2-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Aura.Router Contributors",
+                    "homepage": "https://github.com/auraphp/Aura.Router/contributors"
+                }
+            ],
+            "description": "A web router implementation; given a URI path and a copy of $_SERVER, it will extract path-info parameter values for a specific route.",
+            "homepage": "https://github.com/auraphp/Aura.Router",
+            "keywords": [
+                "route",
+                "router",
+                "routing"
+            ],
+            "time": "2016-10-03 20:00:15"
+        },
         {
             "name": "filp/whoops",
             "version": "2.1.10",

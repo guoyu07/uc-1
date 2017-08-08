@@ -12,6 +12,11 @@ class ComposerStaticInitc577def7a0599dcca99ce72ef967b0f1
     );
 
     public static $prefixLengthsPsr4 = array (
+        'u' => 
+        array (
+            'ucframework\\' => 12,
+            'uc\\' => 3,
+        ),
         'W' => 
         array (
             'Whoops\\' => 7,
@@ -25,9 +30,22 @@ class ComposerStaticInitc577def7a0599dcca99ce72ef967b0f1
         array (
             'Psr\\Log\\' => 8,
         ),
+        'A' => 
+        array (
+            'Aura\\Router\\_Config\\' => 20,
+            'Aura\\Router\\' => 12,
+        ),
     );
 
     public static $prefixDirsPsr4 = array (
+        'ucframework\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/ucframework',
+        ),
+        'uc\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/uc',
+        ),
         'Whoops\\' => 
         array (
             0 => __DIR__ . '/..' . '/filp/whoops/src/Whoops',
@@ -43,6 +61,14 @@ class ComposerStaticInitc577def7a0599dcca99ce72ef967b0f1
         'Psr\\Log\\' => 
         array (
             0 => __DIR__ . '/..' . '/psr/log/Psr/Log',
+        ),
+        'Aura\\Router\\_Config\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/aura/router/config',
+        ),
+        'Aura\\Router\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/aura/router/src',
         ),
     );
 
