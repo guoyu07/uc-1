@@ -3,11 +3,14 @@
         "symfony/var-dumper": "^3.3",
         "filp/whoops": "^2.1",
         "symfony/routing": "^3.3",
-        "nette/http":"^2.3.9"
+        "nette/http": "^2.3.9",
+        "nette/caching": "^2.3.0",
+        "doctrine/orm": "^2.5.6"
     },
     "autoload": {
         "psr-4": {
-            "uc\\": "uc/",
+            "app\\": "uc/app/",
+            "runtime\\": "uc/runtime/",
             "ucframework\\": "ucframework/"  
         }
     }

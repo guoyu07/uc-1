@@ -1,5 +1,5 @@
 <?php
 
 return [
-    'base_index_index'=>'{m}/{c}/{a}'
+    'login' => ['path' => 'base/index/login'],
 ];

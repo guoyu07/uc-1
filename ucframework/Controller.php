@@ -2,6 +2,8 @@
 
 namespace ucframework;
 
+
+
 class Controller
 {
 
@@ -21,10 +23,7 @@ class Controller
 
     public function fetch($template = '')
     {
-        //MODULE_NAME.'/'.
-        $this->_view->fetch('');
+        $this->_view->fetch($template, $this->_assign);
     }
-    
-    
 
 }

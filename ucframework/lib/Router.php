@@ -2,6 +2,7 @@
 
 namespace ucframework\lib;
 
+use ucframework\lib\Config;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RouteCollection;
@@ -16,13 +17,28 @@ class Router
     private $_routes;
     private $_matcher;
     private $_generator;
+    private static $_instance;
 
-    public function __construct()
+    private function __construct()
     {
         $this->_context = new RequestContext();
         $this->_routes = new RouteCollection();
         $this->_matcher = new UrlMatcher($this->_routes, $this->_context);
         $this->_generator = new UrlGenerator($this->_routes, $this->_context);
+        $this->registerRoute(include APP_PATH . 'uc/route.php');
+    }
+
+    /**
+     * 
+     * @return \ucframework\lib\Router
+     */
+    public static function getInstance()
+    {
+        if (!(self::$_instance instanceof self))
+        {
+            self::$_instance = new self();
+        }
+        return self::$_instance;
     }
 
     public function registerRoute($rule)
@@ -50,10 +66,18 @@ class Router
 
     public function matchUrl($url = '')
     {
+        $url = $url == '' ? str_replace($_SERVER['SCRIPT_NAME'], '', $_SERVER['PHP_SELF']) : $url;
         try
         {
-           
             $parameters = $this->_matcher->match($url);
+            $actions = explode('/', $parameters['path']);
+            unset($parameters['path']);
+            unset($parameters['_route']);
+            foreach ($parameters as $k => $p)
+            {
+                $_GET[$k] = $p;
+            }
+            return $actions;
         } catch (ResourceNotFoundException $ex)
         {
 
@@ -63,13 +87,15 @@ class Router
 
     private function getNormalUrl()
     {
-        if (isset($_SERVER['PATH_INFO'])) //pathinfo
+        if (isset($_SERVER['PATH_INFO']))
         {
             $path = explode('/', trim($_SERVER['PATH_INFO'], '/'));
             $patharrcount = count($path);
             if ($patharrcount < 3)
             {
-                
+
+                $config = Config::getInstance()->get('config');
+                return explode('/', $config['default_path']);
             }
             $i = 0;
             $patharrcount > 3 ?
@@ -84,8 +110,24 @@ class Router
             return $actions;
         } else
         {
-            
+            if (!isset($_GET['m']) || !isset($_GET['c']) || !isset($_GET['a']))
+            {
+                $config = Config::getInstance()->get('config');
+                return explode('/', $config['default_path']);
+            }
+            unset($_GET['m']);
+            unset($_GET['c']);
+            unset($_GET['a']);
+            return [$_GET['m'], $_GET['c'], $_GET['a']];
         }
+    }
+
+    /**
+     * 覆盖__clone()方法，禁止克隆   
+     */
+    private function __clone()
+    {
+        
     }
 
 }
