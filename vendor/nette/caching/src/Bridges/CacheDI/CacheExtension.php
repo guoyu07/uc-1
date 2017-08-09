@@ -30,12 +30,12 @@ class CacheExtension extends Nette\DI\CompilerExtension
 		$builder = $this->getContainerBuilder();
 
 		$builder->addDefinition($this->prefix('journal'))
-			->setClass(Nette\Caching\Storages\IJournal::class)
-			->setFactory(Nette\Caching\Storages\SQLiteJournal::class, [$this->tempDir . '/cache/journal.s3db']);
+			->setClass('Nette\Caching\Storages\IJournal')
+			->setFactory('Nette\Caching\Storages\SQLiteJournal', [$this->tempDir . '/cache/journal.s3db']);
 
 		$builder->addDefinition($this->prefix('storage'))
-			->setClass(Nette\Caching\IStorage::class)
-			->setFactory(Nette\Caching\Storages\FileStorage::class, [$this->tempDir . '/cache']);
+			->setClass('Nette\Caching\IStorage')
+			->setFactory('Nette\Caching\Storages\FileStorage', [$this->tempDir . '/cache']);
 
 		if ($this->name === 'cache') {
 			$builder->addAlias('nette.cacheJournal', $this->prefix('journal'));
@@ -47,7 +47,7 @@ class CacheExtension extends Nette\DI\CompilerExtension
 	public function afterCompile(Nette\PhpGenerator\ClassType $class)
 	{
 		if (!$this->checkTempDir($this->tempDir . '/cache')) {
-			$class->getMethod('initialize')->addBody('Nette\Caching\Storages\FileStorage::$useDirectories = false;');
+			$class->getMethod('initialize')->addBody('Nette\Caching\Storages\FileStorage::$useDirectories = FALSE;');
 		}
 	}
 
@@ -57,17 +57,18 @@ class CacheExtension extends Nette\DI\CompilerExtension
 		@mkdir($dir); // @ - directory may exists
 
 		// checks whether directory is writable
-		$uniq = uniqid('_', true);
+		$uniq = uniqid('_', TRUE);
 		if (!@mkdir("$dir/$uniq")) { // @ - is escalated to exception
 			throw new Nette\InvalidStateException("Unable to write to directory '$dir'. Make this directory writable.");
 		}
 
 		// checks whether subdirectory is writable
-		$isWritable = @file_put_contents("$dir/$uniq/_", '') !== false; // @ - error is expected
+		$isWritable = @file_put_contents("$dir/$uniq/_", '') !== FALSE; // @ - error is expected
 		if ($isWritable) {
 			unlink("$dir/$uniq/_");
 		}
 		rmdir("$dir/$uniq");
 		return $isWritable;
 	}
+
 }

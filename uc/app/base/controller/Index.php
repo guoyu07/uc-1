@@ -14,9 +14,8 @@ class Index extends Controller
 
     public function login()
     {
-        $member = new \app\model\Member();
-        $res = $member->getEntityRepository()->find(1);
-        dump($res);
+        $res = \app\model\Area::first();
+        dump($res->id);
         
     }
 

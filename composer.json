@@ -5,7 +5,9 @@
         "symfony/routing": "^3.3",
         "nette/http": "^2.3.9",
         "nette/caching": "^2.3.0",
-        "doctrine/orm": "^2.5.6"
+        "catfan/Medoo": "^1.4",
+        "illuminate/database": "^5.2",
+        "illuminate/events": "^5.2"
     },
     "autoload": {
         "psr-4": {

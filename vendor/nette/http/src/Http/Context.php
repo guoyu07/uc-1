@@ -13,10 +13,8 @@ use Nette;
 /**
  * HTTP-specific tasks.
  */
-class Context
+class Context extends Nette\Object
 {
-	use Nette\SmartObject;
-
 	/** @var IRequest */
 	private $request;
 
@@ -33,11 +31,11 @@ class Context
 
 	/**
 	 * Attempts to cache the sent entity by its last modification date.
-	 * @param  string|int|\DateTimeInterface  last modified time
+	 * @param  string|int|\DateTime  last modified time
 	 * @param  string  strong entity tag validator
 	 * @return bool
 	 */
-	public function isModified($lastModified = null, $etag = null)
+	public function isModified($lastModified = NULL, $etag = NULL)
 	{
 		if ($lastModified) {
 			$this->response->setHeader('Last-Modified', Helpers::formatDate($lastModified));
@@ -48,36 +46,36 @@ class Context
 
 		$ifNoneMatch = $this->request->getHeader('If-None-Match');
 		if ($ifNoneMatch === '*') {
-			$match = true; // match, check if-modified-since
+			$match = TRUE; // match, check if-modified-since
 
-		} elseif ($ifNoneMatch !== null) {
+		} elseif ($ifNoneMatch !== NULL) {
 			$etag = $this->response->getHeader('ETag');
 
-			if ($etag == null || strpos(' ' . strtr($ifNoneMatch, ",\t", '  '), ' ' . $etag) === false) {
-				return true;
+			if ($etag == NULL || strpos(' ' . strtr($ifNoneMatch, ",\t", '  '), ' ' . $etag) === FALSE) {
+				return TRUE;
 
 			} else {
-				$match = true; // match, check if-modified-since
+				$match = TRUE; // match, check if-modified-since
 			}
 		}
 
 		$ifModifiedSince = $this->request->getHeader('If-Modified-Since');
-		if ($ifModifiedSince !== null) {
+		if ($ifModifiedSince !== NULL) {
 			$lastModified = $this->response->getHeader('Last-Modified');
-			if ($lastModified != null && strtotime($lastModified) <= strtotime($ifModifiedSince)) {
-				$match = true;
+			if ($lastModified != NULL && strtotime($lastModified) <= strtotime($ifModifiedSince)) {
+				$match = TRUE;
 
 			} else {
-				return true;
+				return TRUE;
 			}
 		}
 
 		if (empty($match)) {
-			return true;
+			return TRUE;
 		}
 
 		$this->response->setCode(IResponse::S304_NOT_MODIFIED);
-		return false;
+		return FALSE;
 	}
 
 
@@ -97,4 +95,5 @@ class Context
 	{
 		return $this->response;
 	}
+
 }

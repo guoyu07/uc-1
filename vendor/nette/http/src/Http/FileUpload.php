@@ -15,17 +15,15 @@ use Nette;
  *
  * @property-read string $name
  * @property-read string $sanitizedName
- * @property-read string|null $contentType
+ * @property-read string|NULL $contentType
  * @property-read int $size
  * @property-read string $temporaryFile
  * @property-read int $error
  * @property-read bool $ok
- * @property-read string|null $contents
+ * @property-read string|NULL $contents
  */
-class FileUpload
+class FileUpload extends Nette\Object
 {
-	use Nette\SmartObject;
-
 	/** @var string */
 	private $name;
 
@@ -44,7 +42,7 @@ class FileUpload
 
 	public function __construct($value)
 	{
-		foreach (['name', 'type', 'size', 'tmp_name', 'error'] as $key) {
+		foreach (array('name', 'type', 'size', 'tmp_name', 'error') as $key) {
 			if (!isset($value[$key]) || !is_scalar($value[$key])) {
 				$this->error = UPLOAD_ERR_NO_FILE;
 				return; // or throw exception?
@@ -73,17 +71,17 @@ class FileUpload
 	 */
 	public function getSanitizedName()
 	{
-		return trim(Nette\Utils\Strings::webalize($this->name, '.', false), '.-');
+		return trim(Nette\Utils\Strings::webalize($this->name, '.', FALSE), '.-');
 	}
 
 
 	/**
 	 * Returns the MIME content type of an uploaded file.
-	 * @return string|null
+	 * @return string|NULL
 	 */
 	public function getContentType()
 	{
-		if ($this->isOk() && $this->type === null) {
+		if ($this->isOk() && $this->type === NULL) {
 			$this->type = finfo_file(finfo_open(FILEINFO_MIME_TYPE), $this->tmpName);
 		}
 		return $this->type;
@@ -141,34 +139,17 @@ class FileUpload
 
 
 	/**
-	 * @return bool
-	 */
-	public function hasFile()
-	{
-		return $this->error !== UPLOAD_ERR_NO_FILE;
-	}
-
-
-	/**
 	 * Move uploaded file to new location.
 	 * @param  string
 	 * @return static
 	 */
 	public function move($dest)
 	{
-		$dir = dirname($dest);
-		@mkdir($dir, 0777, true); // @ - dir may already exist
-		if (!is_dir($dir)) {
-			throw new Nette\InvalidStateException("Directory '$dir' cannot be created. " . error_get_last()['message']);
-		}
+		@mkdir(dirname($dest), 0777, TRUE); // @ - dir may already exist
 		@unlink($dest); // @ - file may not exists
-		Nette\Utils\Callback::invokeSafe(
-			is_uploaded_file($this->tmpName) ? 'move_uploaded_file' : 'rename',
-			[$this->tmpName, $dest],
-			function ($message) use ($dest) {
-				throw new Nette\InvalidStateException("Unable to move uploaded file '$this->tmpName' to '$dest'. $message");
-			}
-		);
+		if (!call_user_func(is_uploaded_file($this->tmpName) ? 'move_uploaded_file' : 'rename', $this->tmpName, $dest)) {
+			throw new Nette\InvalidStateException("Unable to move uploaded file '$this->tmpName' to '$dest'.");
+		}
 		@chmod($dest, 0666); // @ - possible low permission to chmod
 		$this->tmpName = $dest;
 		return $this;
@@ -181,7 +162,7 @@ class FileUpload
 	 */
 	public function isImage()
 	{
-		return in_array($this->getContentType(), ['image/gif', 'image/png', 'image/jpeg'], true);
+		return in_array($this->getContentType(), array('image/gif', 'image/png', 'image/jpeg'), TRUE);
 	}
 
 
@@ -198,21 +179,22 @@ class FileUpload
 
 	/**
 	 * Returns the dimensions of an uploaded image as array.
-	 * @return array|null
+	 * @return array|NULL
 	 */
 	public function getImageSize()
 	{
-		return $this->isOk() ? @getimagesize($this->tmpName) : null; // @ - files smaller than 12 bytes causes read error
+		return $this->isOk() ? @getimagesize($this->tmpName) : NULL; // @ - files smaller than 12 bytes causes read error
 	}
 
 
 	/**
 	 * Get file contents.
-	 * @return string|null
+	 * @return string|NULL
 	 */
 	public function getContents()
 	{
 		// future implementation can try to work around safe_mode and open_basedir limitations
-		return $this->isOk() ? file_get_contents($this->tmpName) : null;
+		return $this->isOk() ? file_get_contents($this->tmpName) : NULL;
 	}
+
 }

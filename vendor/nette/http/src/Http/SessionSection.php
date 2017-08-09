@@ -13,13 +13,8 @@ use Nette;
 /**
  * Session section.
  */
-class SessionSection implements \IteratorAggregate, \ArrayAccess
+class SessionSection extends Nette\Object implements \IteratorAggregate, \ArrayAccess
 {
-	use Nette\SmartObject;
-
-	/** @var bool */
-	public $warnOnUndefined = false;
-
 	/** @var Session */
 	private $session;
 
@@ -30,7 +25,10 @@ class SessionSection implements \IteratorAggregate, \ArrayAccess
 	private $data;
 
 	/** @var array  session metadata storage */
-	private $meta = false;
+	private $meta = FALSE;
+
+	/** @var bool */
+	public $warnOnUndefined = FALSE;
 
 
 	/**
@@ -47,19 +45,22 @@ class SessionSection implements \IteratorAggregate, \ArrayAccess
 	}
 
 
+	/**
+	 * Do not call directly. Use Session::getNamespace().
+	 */
 	private function start()
 	{
-		if ($this->meta === false) {
+		if ($this->meta === FALSE) {
 			$this->session->start();
-			$this->data = &$_SESSION['__NF']['DATA'][$this->name];
-			$this->meta = &$_SESSION['__NF']['META'][$this->name];
+			$this->data = & $_SESSION['__NF']['DATA'][$this->name];
+			$this->meta = & $_SESSION['__NF']['META'][$this->name];
 		}
 	}
 
 
 	/**
 	 * Returns an iterator over all section variables.
-	 * @return \Iterator
+	 * @return \ArrayIterator
 	 */
 	public function getIterator()
 	{
@@ -94,7 +95,7 @@ class SessionSection implements \IteratorAggregate, \ArrayAccess
 	{
 		$this->start();
 		if ($this->warnOnUndefined && !array_key_exists($name, $this->data)) {
-			trigger_error("The variable '$name' does not exist in session section");
+			trigger_error("The variable '$name' does not exist in session section", E_USER_NOTICE);
 		}
 
 		return $this->data[$name];
@@ -174,23 +175,28 @@ class SessionSection implements \IteratorAggregate, \ArrayAccess
 
 	/**
 	 * Sets the expiration of the section or specific variables.
-	 * @param  string|int|\DateTimeInterface  time
+	 * @param  string|int|\DateTime  time, value 0 means "until the browser is closed"
 	 * @param  mixed   optional list of variables / single variable to expire
 	 * @return static
 	 */
-	public function setExpiration($time, $variables = null)
+	public function setExpiration($time, $variables = NULL)
 	{
 		$this->start();
-		if ($time) {
+		if (empty($time)) {
+			$time = NULL;
+			$whenBrowserIsClosed = TRUE;
+		} else {
 			$time = Nette\Utils\DateTime::from($time)->format('U');
 			$max = (int) ini_get('session.gc_maxlifetime');
 			if ($max !== 0 && ($time - time() > $max + 3)) { // 0 - unlimited in memcache handler, 3 - bulgarian constant
-				trigger_error("The expiration time is greater than the session expiration $max seconds");
+				trigger_error("The expiration time is greater than the session expiration $max seconds", E_USER_NOTICE);
 			}
+			$whenBrowserIsClosed = FALSE;
 		}
 
-		foreach (is_array($variables) ? $variables : [$variables] as $variable) {
-			$this->meta[$variable]['T'] = $time ?: null;
+		foreach (is_array($variables) ? $variables : array($variables) as $variable) {
+			$this->meta[$variable]['T'] = $time;
+			$this->meta[$variable]['B'] = $whenBrowserIsClosed;
 		}
 		return $this;
 	}
@@ -201,11 +207,11 @@ class SessionSection implements \IteratorAggregate, \ArrayAccess
 	 * @param  mixed   optional list of variables / single variable to expire
 	 * @return void
 	 */
-	public function removeExpiration($variables = null)
+	public function removeExpiration($variables = NULL)
 	{
 		$this->start();
-		foreach (is_array($variables) ? $variables : [$variables] as $variable) {
-			unset($this->meta[$variable]['T']);
+		foreach (is_array($variables) ? $variables : array($variables) as $variable) {
+			unset($this->meta[$variable]['T'], $this->meta[$variable]['B']);
 		}
 	}
 
@@ -217,7 +223,8 @@ class SessionSection implements \IteratorAggregate, \ArrayAccess
 	public function remove()
 	{
 		$this->start();
-		$this->data = null;
-		$this->meta = null;
+		$this->data = NULL;
+		$this->meta = NULL;
 	}
+
 }

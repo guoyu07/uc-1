@@ -13,11 +13,9 @@ use Nette;
 /**
  * Provides the base class for a generic list (items can be accessed by index).
  */
-class ArrayList implements \ArrayAccess, \Countable, \IteratorAggregate
+class ArrayList extends Nette\Object implements \ArrayAccess, \Countable, \IteratorAggregate
 {
-	use Nette\SmartObject;
-
-	private $list = [];
+	private $list = array();
 
 
 	/**
@@ -42,14 +40,14 @@ class ArrayList implements \ArrayAccess, \Countable, \IteratorAggregate
 
 	/**
 	 * Replaces or appends a item.
-	 * @param  int|null
+	 * @param  int|NULL
 	 * @param  mixed
 	 * @return void
 	 * @throws Nette\OutOfRangeException
 	 */
 	public function offsetSet($index, $value)
 	{
-		if ($index === null) {
+		if ($index === NULL) {
 			$this->list[] = $value;
 
 		} elseif ($index < 0 || $index >= count($this->list)) {
@@ -101,16 +99,4 @@ class ArrayList implements \ArrayAccess, \Countable, \IteratorAggregate
 		array_splice($this->list, (int) $index, 1);
 	}
 
-
-	/**
-	 * Prepends a item.
-	 * @param  mixed
-	 * @return void
-	 */
-	public function prepend($value)
-	{
-		$first = array_slice($this->list, 0, 1);
-		$this->offsetSet(0, $value);
-		array_splice($this->list, 1, 0, $first);
-	}
 }

@@ -21,55 +21,53 @@ use Nette;
  * echo $el->startTag(), $el->endTag();
  * </code>
  */
-class Html implements \ArrayAccess, \Countable, \IteratorAggregate, IHtmlString
+class Html extends Nette\Object implements \ArrayAccess, \Countable, \IteratorAggregate, IHtmlString
 {
-	use Nette\SmartObject;
-
-	/** @var array  element's attributes */
-	public $attrs = [];
-
-	/** @var bool  use XHTML syntax? */
-	public static $xhtml = false;
-
-	/** @var array  empty (void) elements */
-	public static $emptyElements = [
-		'img' => 1, 'hr' => 1, 'br' => 1, 'input' => 1, 'meta' => 1, 'area' => 1, 'embed' => 1, 'keygen' => 1,
-		'source' => 1, 'base' => 1, 'col' => 1, 'link' => 1, 'param' => 1, 'basefont' => 1, 'frame' => 1,
-		'isindex' => 1, 'wbr' => 1, 'command' => 1, 'track' => 1,
-	];
-
-	/** @var array  of Html | string nodes */
-	protected $children = [];
-
 	/** @var string  element's name */
 	private $name;
 
 	/** @var bool  is element empty? */
 	private $isEmpty;
 
+	/** @var array  element's attributes */
+	public $attrs = array();
+
+	/** @var array  of Html | string nodes */
+	protected $children = array();
+
+	/** @var bool  use XHTML syntax? */
+	public static $xhtml = FALSE;
+
+	/** @var array  empty (void) elements */
+	public static $emptyElements = array(
+		'img' => 1, 'hr' => 1, 'br' => 1, 'input' => 1, 'meta' => 1, 'area' => 1, 'embed' => 1, 'keygen' => 1,
+		'source' => 1, 'base' => 1, 'col' => 1, 'link' => 1, 'param' => 1, 'basefont' => 1, 'frame' => 1,
+		'isindex' => 1, 'wbr' => 1, 'command' => 1, 'track' => 1,
+	);
+
 
 	/**
 	 * Static factory.
-	 * @param  string element name (or null)
+	 * @param  string element name (or NULL)
 	 * @param  array|string element's attributes or plain text content
 	 * @return static
 	 */
-	public static function el($name = null, $attrs = null)
+	public static function el($name = NULL, $attrs = NULL)
 	{
 		$el = new static;
-		$parts = explode(' ', (string) $name, 2);
+		$parts = explode(' ', $name, 2);
 		$el->setName($parts[0]);
 
 		if (is_array($attrs)) {
 			$el->attrs = $attrs;
 
-		} elseif ($attrs !== null) {
+		} elseif ($attrs !== NULL) {
 			$el->setText($attrs);
 		}
 
 		if (isset($parts[1])) {
 			foreach (Strings::matchAll($parts[1] . ' ', '#([a-z0-9:-]+)(?:=(["\'])?(.*?)(?(2)\\2|\s))?#i') as $m) {
-				$el->attrs[$m[1]] = isset($m[3]) ? $m[3] : true;
+				$el->attrs[$m[1]] = isset($m[3]) ? $m[3] : TRUE;
 			}
 		}
 
@@ -84,14 +82,14 @@ class Html implements \ArrayAccess, \Countable, \IteratorAggregate, IHtmlString
 	 * @return static
 	 * @throws Nette\InvalidArgumentException
 	 */
-	public function setName($name, $isEmpty = null)
+	public function setName($name, $isEmpty = NULL)
 	{
-		if ($name !== null && !is_string($name)) {
-			throw new Nette\InvalidArgumentException(sprintf('Name must be string or null, %s given.', gettype($name)));
+		if ($name !== NULL && !is_string($name)) {
+			throw new Nette\InvalidArgumentException(sprintf('Name must be string or NULL, %s given.', gettype($name)));
 		}
 
 		$this->name = $name;
-		$this->isEmpty = $isEmpty === null ? isset(static::$emptyElements[$name]) : (bool) $isEmpty;
+		$this->isEmpty = $isEmpty === NULL ? isset(static::$emptyElements[$name]) : (bool) $isEmpty;
 		return $this;
 	}
 
@@ -124,68 +122,6 @@ class Html implements \ArrayAccess, \Countable, \IteratorAggregate, IHtmlString
 	public function addAttributes(array $attrs)
 	{
 		$this->attrs = array_merge($this->attrs, $attrs);
-		return $this;
-	}
-
-
-	/**
-	 * Appends value to element's attribute.
-	 * @param  string
-	 * @param  string|array value to append
-	 * @param  string|bool  value option
-	 * @return static
-	 */
-	public function appendAttribute($name, $value, $option = true)
-	{
-		if (is_array($value)) {
-			$prev = isset($this->attrs[$name]) ? (array) $this->attrs[$name] : [];
-			$this->attrs[$name] = $value + $prev;
-
-		} elseif ((string) $value === '') {
-			$tmp = &$this->attrs[$name]; // appending empty value? -> ignore, but ensure it exists
-
-		} elseif (!isset($this->attrs[$name]) || is_array($this->attrs[$name])) { // needs array
-			$this->attrs[$name][$value] = $option;
-
-		} else {
-			$this->attrs[$name] = [$this->attrs[$name] => true, $value => $option];
-		}
-		return $this;
-	}
-
-
-	/**
-	 * Sets element's attribute.
-	 * @param  string
-	 * @param  mixed
-	 * @return static
-	 */
-	public function setAttribute($name, $value)
-	{
-		$this->attrs[$name] = $value;
-		return $this;
-	}
-
-
-	/**
-	 * Returns element's attribute.
-	 * @param  string
-	 * @return mixed
-	 */
-	public function getAttribute($name)
-	{
-		return isset($this->attrs[$name]) ? $this->attrs[$name] : null;
-	}
-
-
-	/**
-	 * Unsets element's attribute.
-	 * @param  string
-	 * @return static
-	 */
-	public function removeAttribute($name)
-	{
-		unset($this->attrs[$name]);
 		return $this;
 	}
 
@@ -239,7 +175,7 @@ class Html implements \ArrayAccess, \Countable, \IteratorAggregate, IHtmlString
 	 * Overloaded setter for element's attribute.
 	 * @param  string  HTML attribute name
 	 * @param  array   (string) HTML attribute value or pair?
-	 * @return mixed
+	 * @return static
 	 */
 	public function __call($m, $args)
 	{
@@ -248,10 +184,10 @@ class Html implements \ArrayAccess, \Countable, \IteratorAggregate, IHtmlString
 			$m = substr($m, 3);
 			$m[0] = $m[0] | "\x20";
 			if ($p === 'get') {
-				return isset($this->attrs[$m]) ? $this->attrs[$m] : null;
+				return isset($this->attrs[$m]) ? $this->attrs[$m] : NULL;
 
 			} elseif ($p === 'add') {
-				$args[] = true;
+				$args[] = TRUE;
 			}
 		}
 
@@ -260,8 +196,14 @@ class Html implements \ArrayAccess, \Countable, \IteratorAggregate, IHtmlString
 		} elseif (count($args) === 1) { // set
 			$this->attrs[$m] = $args[0];
 
-		} else { // add
-			$this->appendAttribute($m, $args[0], $args[1]);
+		} elseif ((string) $args[0] === '') {
+			$tmp = & $this->attrs[$m]; // appending empty value? -> ignore, but ensure it exists
+
+		} elseif (!isset($this->attrs[$m]) || is_array($this->attrs[$m])) { // needs array
+			$this->attrs[$m][$args[0]] = $args[1];
+
+		} else {
+			$this->attrs[$m] = array($this->attrs[$m], $args[0] => $args[1]);
 		}
 
 		return $this;
@@ -274,10 +216,10 @@ class Html implements \ArrayAccess, \Countable, \IteratorAggregate, IHtmlString
 	 * @param  array query
 	 * @return static
 	 */
-	public function href($path, $query = null)
+	public function href($path, $query = NULL)
 	{
 		if ($query) {
-			$query = http_build_query($query, '', '&');
+			$query = http_build_query($query, NULL, '&');
 			if ($query !== '') {
 				$path .= '?' . $query;
 			}
@@ -291,7 +233,7 @@ class Html implements \ArrayAccess, \Countable, \IteratorAggregate, IHtmlString
 	 * Setter for data-* attributes. Booleans are converted to 'true' resp. 'false'.
 	 * @return static
 	 */
-	public function data($name, $value = null)
+	public function data($name, $value = NULL)
 	{
 		if (func_num_args() === 1) {
 			$this->attrs['data'] = $name;
@@ -363,11 +305,12 @@ class Html implements \ArrayAccess, \Countable, \IteratorAggregate, IHtmlString
 
 
 	/**
-	 * @deprecated
+	 * Adds new element's child.
+	 * @param  Html|string Html node or raw HTML string
+	 * @return static
 	 */
 	public function add($child)
 	{
-		trigger_error(__METHOD__ . '() is deprecated, use addHtml() or addText() instead.', E_USER_DEPRECATED);
 		return $this->addHtml($child);
 	}
 
@@ -379,7 +322,7 @@ class Html implements \ArrayAccess, \Countable, \IteratorAggregate, IHtmlString
 	 */
 	public function addHtml($child)
 	{
-		return $this->insert(null, $child);
+		return $this->insert(NULL, $child);
 	}
 
 
@@ -391,7 +334,7 @@ class Html implements \ArrayAccess, \Countable, \IteratorAggregate, IHtmlString
 	public function addText($text)
 	{
 		$text = htmlspecialchars($text, ENT_NOQUOTES, 'UTF-8');
-		return $this->insert(null, $text);
+		return $this->insert(NULL, $text);
 	}
 
 
@@ -401,29 +344,29 @@ class Html implements \ArrayAccess, \Countable, \IteratorAggregate, IHtmlString
 	 * @param  array|string element's attributes or raw HTML string
 	 * @return static  created element
 	 */
-	public function create($name, $attrs = null)
+	public function create($name, $attrs = NULL)
 	{
-		$this->insert(null, $child = static::el($name, $attrs));
+		$this->insert(NULL, $child = static::el($name, $attrs));
 		return $child;
 	}
 
 
 	/**
 	 * Inserts child node.
-	 * @param  int|null position or null for appending
+	 * @param  int|NULL position or NULL for appending
 	 * @param  Html|string Html node or raw HTML string
 	 * @param  bool
 	 * @return static
 	 * @throws Nette\InvalidArgumentException
 	 */
-	public function insert($index, $child, $replace = false)
+	public function insert($index, $child, $replace = FALSE)
 	{
 		if ($child instanceof self || is_scalar($child)) {
-			if ($index === null) { // append
+			if ($index === NULL) { // append
 				$this->children[] = $child;
 
 			} else { // insert or replace
-				array_splice($this->children, (int) $index, $replace ? 1 : 0, [$child]);
+				array_splice($this->children, (int) $index, $replace ? 1 : 0, array($child));
 			}
 
 		} else {
@@ -436,13 +379,13 @@ class Html implements \ArrayAccess, \Countable, \IteratorAggregate, IHtmlString
 
 	/**
 	 * Inserts (replaces) child node (\ArrayAccess implementation).
-	 * @param  int|null position or null for appending
+	 * @param  int|NULL position or NULL for appending
 	 * @param  Html|string Html node or raw HTML string
 	 * @return void
 	 */
 	public function offsetSet($index, $child)
 	{
-		$this->insert($index, $child, true);
+		$this->insert($index, $child, TRUE);
 	}
 
 
@@ -497,7 +440,7 @@ class Html implements \ArrayAccess, \Countable, \IteratorAggregate, IHtmlString
 	 */
 	public function removeChildren()
 	{
-		$this->children = [];
+		$this->children = array();
 	}
 
 
@@ -526,13 +469,13 @@ class Html implements \ArrayAccess, \Countable, \IteratorAggregate, IHtmlString
 	 * @param  int
 	 * @return string
 	 */
-	public function render($indent = null)
+	public function render($indent = NULL)
 	{
 		$s = $this->startTag();
 
 		if (!$this->isEmpty) {
 			// add content
-			if ($indent !== null) {
+			if ($indent !== NULL) {
 				$indent++;
 			}
 			foreach ($this->children as $child) {
@@ -547,7 +490,7 @@ class Html implements \ArrayAccess, \Countable, \IteratorAggregate, IHtmlString
 			$s .= $this->endTag();
 		}
 
-		if ($indent !== null) {
+		if ($indent !== NULL) {
 			return "\n" . str_repeat("\t", $indent - 1) . $s . "\n" . str_repeat("\t", max(0, $indent - 2));
 		}
 		return $s;
@@ -558,10 +501,10 @@ class Html implements \ArrayAccess, \Countable, \IteratorAggregate, IHtmlString
 	{
 		try {
 			return $this->render();
-		} catch (\Exception $e) {
 		} catch (\Throwable $e) {
+		} catch (\Exception $e) {
 		}
-		trigger_error('Exception in ' . __METHOD__ . "(): {$e->getMessage()} in {$e->getFile()}:{$e->getLine()}", E_USER_ERROR);
+		trigger_error("Exception in " . __METHOD__ . "(): {$e->getMessage()} in {$e->getFile()}:{$e->getLine()}", E_USER_ERROR);
 	}
 
 
@@ -604,7 +547,6 @@ class Html implements \ArrayAccess, \Countable, \IteratorAggregate, IHtmlString
 		$s = '';
 		$attrs = $this->attrs;
 		if (isset($attrs['data']) && is_array($attrs['data'])) { // deprecated
-			trigger_error('Expanded attribute "data" is deprecated.', E_USER_DEPRECATED);
 			foreach ($attrs['data'] as $key => $value) {
 				$attrs['data-' . $key] = $value;
 			}
@@ -612,10 +554,10 @@ class Html implements \ArrayAccess, \Countable, \IteratorAggregate, IHtmlString
 		}
 
 		foreach ($attrs as $key => $value) {
-			if ($value === null || $value === false) {
+			if ($value === NULL || $value === FALSE) {
 				continue;
 
-			} elseif ($value === true) {
+			} elseif ($value === TRUE) {
 				if (static::$xhtml) {
 					$s .= ' ' . $key . '="' . $key . '"';
 				} else {
@@ -628,14 +570,14 @@ class Html implements \ArrayAccess, \Countable, \IteratorAggregate, IHtmlString
 					$value = Json::encode($value);
 
 				} else {
-					$tmp = null;
+					$tmp = NULL;
 					foreach ($value as $k => $v) {
-						if ($v != null) { // intentionally ==, skip nulls & empty string
+						if ($v != NULL) { // intentionally ==, skip NULLs & empty string
 							//  composite 'style' vs. 'others'
-							$tmp[] = $v === true ? $k : (is_string($k) ? $k . ':' . $v : $v);
+							$tmp[] = $v === TRUE ? $k : (is_string($k) ? $k . ':' . $v : $v);
 						}
 					}
-					if ($tmp === null) {
+					if ($tmp === NULL) {
 						continue;
 					}
 
@@ -649,14 +591,14 @@ class Html implements \ArrayAccess, \Countable, \IteratorAggregate, IHtmlString
 				$value = (string) $value;
 			}
 
-			$q = strpos($value, '"') === false ? '"' : "'";
+			$q = strpos($value, '"') === FALSE ? '"' : "'";
 			$s .= ' ' . $key . '=' . $q
 				. str_replace(
-					['&', $q, '<'],
-					['&amp;', $q === '"' ? '&quot;' : '&#39;', self::$xhtml ? '&lt;' : '<'],
+					array('&', $q, '<'),
+					array('&amp;', $q === '"' ? '&quot;' : '&#39;', self::$xhtml ? '&lt;' : '<'),
 					$value
 				)
-				. (strpos($value, '`') !== false && strpbrk($value, ' <>"\'') === false ? ' ' : '')
+				. (strpos($value, '`') !== FALSE && strpbrk($value, ' <>"\'') === FALSE ? ' ' : '')
 				. $q;
 		}
 
@@ -676,4 +618,5 @@ class Html implements \ArrayAccess, \Countable, \IteratorAggregate, IHtmlString
 			}
 		}
 	}
+
 }

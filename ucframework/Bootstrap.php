@@ -32,6 +32,8 @@ class Bootstrap
     public static function run()
     {
         self::isOpenDebug();
+        
+        DatabaseManage::register();
         $router = Router::getInstance();
         $actions = $router->matchUrl();
         define('MODULE_NAME', $actions[0]);

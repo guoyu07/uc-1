@@ -1,17 +1,13 @@
 <?php
 
 return [
-    'driver' => 'pdo_mysql',
-    //数据库服务器地址
-    'host' => '127.0.0.1',
-    // 数据库名
-    'dbname' => 'uc',
-    // 用户名
-    'user' => 'root',
-    // 密码
+    'driver' => 'mysql',
+    'host' => 'localhost',
+    'database' => 'test',
+    'username' => 'root',
+    'port' => 3306,
     'password' => '',
-    // 端口
-    'port' => '3306',
-    
-    'prefix'=>'uc_',
+    'charset' => 'utf8',
+    'collation' => 'utf8_unicode_ci',
+    'prefix' => 'bw_',
 ];
