@@ -6,6 +6,7 @@
 
 namespace ucframework;
 
+use Exception;
 use Whoops\Run;
 use ucframework\lib\Router;
 use Whoops\Handler\PrettyPageHandler;
@@ -32,10 +33,14 @@ class Bootstrap
     public static function run()
     {
         self::isOpenDebug();
-        
+
         DatabaseManage::register();
         $router = Router::getInstance();
         $actions = $router->matchUrl();
+        if (in_array($actions[0], ['runtime', 'template','model','components']))
+        {
+            throw new Exception('连接地址不正确');
+        }
         define('MODULE_NAME', $actions[0]);
         define('CONTROLLER_NAME', $actions[1]);
         define('ACTION_NAME', $actions[2]);

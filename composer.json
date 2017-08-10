@@ -7,12 +7,13 @@
         "nette/caching": "^2.3.0",
         "catfan/Medoo": "^1.4",
         "illuminate/database": "^5.2",
-        "illuminate/events": "^5.2"
+        "illuminate/events": "^5.2",
+        "gregwar/captcha": "^1.1"
     },
     "autoload": {
         "psr-4": {
             "app\\": "uc/app/",
-            "runtime\\": "uc/runtime/",
+            "components\\": "uc/components/",
             "ucframework\\": "ucframework/"  
         }
     }
