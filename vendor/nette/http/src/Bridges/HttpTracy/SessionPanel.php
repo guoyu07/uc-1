@@ -14,9 +14,8 @@ use Tracy;
 /**
  * Session panel for Debugger Bar.
  */
-class SessionPanel implements Tracy\IBarPanel
+class SessionPanel extends Nette\Object implements Tracy\IBarPanel
 {
-	use Nette\SmartObject;
 
 	/**
 	 * Renders tab.
@@ -40,4 +39,5 @@ class SessionPanel implements Tracy\IBarPanel
 		require __DIR__ . '/templates/SessionPanel.panel.phtml';
 		return ob_get_clean();
 	}
+
 }

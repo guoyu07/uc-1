@@ -45,18 +45,16 @@ use Nette;
  * @property-read string $relativeUrl
  * @property-read array $queryParameters
  */
-class Url implements \JsonSerializable
+class Url extends Nette\Object
 {
-	use Nette\SmartObject;
-
 	/** @var array */
-	public static $defaultPorts = [
+	public static $defaultPorts = array(
 		'http' => 80,
 		'https' => 443,
 		'ftp' => 21,
 		'news' => 119,
 		'nntp' => 119,
-	];
+	);
 
 	/** @var string */
 	private $scheme = '';
@@ -70,14 +68,14 @@ class Url implements \JsonSerializable
 	/** @var string */
 	private $host = '';
 
-	/** @var int|null */
+	/** @var int */
 	private $port;
 
 	/** @var string */
 	private $path = '';
 
 	/** @var array */
-	private $query = [];
+	private $query = array();
 
 	/** @var string */
 	private $fragment = '';
@@ -87,21 +85,21 @@ class Url implements \JsonSerializable
 	 * @param  string|self
 	 * @throws Nette\InvalidArgumentException if URL is malformed
 	 */
-	public function __construct($url = null)
+	public function __construct($url = NULL)
 	{
 		if (is_string($url)) {
 			$p = @parse_url($url); // @ - is escalated to exception
-			if ($p === false) {
+			if ($p === FALSE) {
 				throw new Nette\InvalidArgumentException("Malformed or unsupported URI '$url'.");
 			}
 
 			$this->scheme = isset($p['scheme']) ? $p['scheme'] : '';
-			$this->port = isset($p['port']) ? $p['port'] : null;
+			$this->port = isset($p['port']) ? $p['port'] : NULL;
 			$this->host = isset($p['host']) ? rawurldecode($p['host']) : '';
 			$this->user = isset($p['user']) ? rawurldecode($p['user']) : '';
 			$this->password = isset($p['pass']) ? rawurldecode($p['pass']) : '';
 			$this->setPath(isset($p['path']) ? $p['path'] : '');
-			$this->setQuery(isset($p['query']) ? $p['query'] : []);
+			$this->setQuery(isset($p['query']) ? $p['query'] : array());
 			$this->fragment = isset($p['fragment']) ? rawurldecode($p['fragment']) : '';
 
 		} elseif ($url instanceof self) {
@@ -202,18 +200,6 @@ class Url implements \JsonSerializable
 
 
 	/**
-	 * Returns the part of domain.
-	 * @return string
-	 */
-	public function getDomain($level = 2)
-	{
-		$parts = ip2long($this->host) ? [$this->host] : explode('.', $this->host);
-		$parts = $level >= 0 ? array_slice($parts, -$level) : array_slice($parts, 0, $level);
-		return implode('.', $parts);
-	}
-
-
-	/**
 	 * Sets the port part of URI.
 	 * @param  int
 	 * @return static
@@ -227,13 +213,13 @@ class Url implements \JsonSerializable
 
 	/**
 	 * Returns the port part of URI.
-	 * @return int|null
+	 * @return int
 	 */
 	public function getPort()
 	{
 		return $this->port
 			? $this->port
-			: (isset(self::$defaultPorts[$this->scheme]) ? self::$defaultPorts[$this->scheme] : null);
+			: (isset(self::$defaultPorts[$this->scheme]) ? self::$defaultPorts[$this->scheme] : NULL);
 	}
 
 
@@ -294,6 +280,9 @@ class Url implements \JsonSerializable
 	 */
 	public function getQuery()
 	{
+		if (PHP_VERSION_ID < 50400) {
+			return str_replace('+', '%20', http_build_query($this->query, '', '&'));
+		}
 		return http_build_query($this->query, '', '&', PHP_QUERY_RFC3986);
 	}
 
@@ -312,7 +301,7 @@ class Url implements \JsonSerializable
 	 * @param mixed
 	 * @return mixed
 	 */
-	public function getQueryParameter($name, $default = null)
+	public function getQueryParameter($name, $default = NULL)
 	{
 		return isset($this->query[$name]) ? $this->query[$name] : $default;
 	}
@@ -320,7 +309,7 @@ class Url implements \JsonSerializable
 
 	/**
 	 * @param string
-	 * @param mixed null unsets the parameter
+	 * @param mixed NULL unsets the parameter
 	 * @return static
 	 */
 	public function setQueryParameter($name, $value)
@@ -388,8 +377,7 @@ class Url implements \JsonSerializable
 	 */
 	public function getHostUrl()
 	{
-		return ($this->scheme ? $this->scheme . ':' : '')
-			. (($authority = $this->getAuthority()) || $this->scheme ? '//' . $authority : '');
+		return ($this->scheme ? $this->scheme . ':' : '') . '//' . $this->getAuthority();
 	}
 
 
@@ -400,7 +388,7 @@ class Url implements \JsonSerializable
 	public function getBasePath()
 	{
 		$pos = strrpos($this->path, '/');
-		return $pos === false ? '' : substr($this->path, 0, $pos + 1);
+		return $pos === FALSE ? '' : substr($this->path, 0, $pos + 1);
 	}
 
 
@@ -436,7 +424,7 @@ class Url implements \JsonSerializable
 		ksort($query);
 		$query2 = $this->query;
 		ksort($query2);
-		$http = in_array($this->scheme, ['http', 'https'], true);
+		$http = in_array($this->scheme, array('http', 'https'), TRUE);
 		return $url->scheme === $this->scheme
 			&& !strcasecmp($url->host, $this->host)
 			&& $url->getPort() === $this->getPort()
@@ -474,15 +462,6 @@ class Url implements \JsonSerializable
 
 
 	/**
-	 * @return string
-	 */
-	public function jsonSerialize()
-	{
-		return $this->getAbsoluteUrl();
-	}
-
-
-	/**
 	 * Similar to rawurldecode, but preserves reserved chars encoded.
 	 * @param  string to decode
 	 * @param  string reserved characters
@@ -511,6 +490,10 @@ class Url implements \JsonSerializable
 	public static function parseQuery($s)
 	{
 		parse_str($s, $res);
+		if (get_magic_quotes_gpc()) { // for PHP 5.3
+			$res = Helpers::stripSlashes($res);
+		}
 		return $res;
 	}
+
 }

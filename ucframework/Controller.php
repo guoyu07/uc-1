@@ -2,7 +2,7 @@
 
 namespace ucframework;
 
-
+use ucframework\lib\Request;
 
 class Controller
 {
@@ -24,6 +24,17 @@ class Controller
     public function fetch($template = '')
     {
         $this->_view->fetch($template, $this->_assign);
+    }
+
+    public function success()
+    {
+        if (Request::getInstance()->isAjax())
+        {
+            
+        } else
+        {
+            
+        }
     }
 
 }

@@ -57,7 +57,7 @@ abstract class Object
 	 */
 	public static function getReflection()
 	{
-		$class = class_exists(Nette\Reflection\ClassType::class) ? Nette\Reflection\ClassType::class : 'ReflectionClass';
+		$class = class_exists('Nette\Reflection\ClassType') ? 'Nette\Reflection\ClassType' : 'ReflectionClass';
 		return new $class(get_called_class());
 	}
 
@@ -94,15 +94,16 @@ abstract class Object
 	 * @param  callable
 	 * @return mixed
 	 */
-	public static function extensionMethod($name, $callback = null)
+	public static function extensionMethod($name, $callback = NULL)
 	{
-		if (strpos($name, '::') === false) {
+		if (strpos($name, '::') === FALSE) {
 			$class = get_called_class();
 		} else {
 			list($class, $name) = explode('::', $name);
-			$class = (new \ReflectionClass($class))->getName();
+			$rc = new \ReflectionClass($class);
+			$class = $rc->getName();
 		}
-		if ($callback === null) {
+		if ($callback === NULL) {
 			return Nette\Utils\ObjectMixin::getExtensionMethod($class, $name);
 		} else {
 			Nette\Utils\ObjectMixin::setExtensionMethod($class, $name, $callback);
@@ -156,4 +157,5 @@ abstract class Object
 	{
 		Nette\Utils\ObjectMixin::remove($this, $name);
 	}
+
 }

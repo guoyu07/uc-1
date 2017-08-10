@@ -21,12 +21,12 @@ class ArrayHash extends \stdClass implements \ArrayAccess, \Countable, \Iterator
 	 * @param  bool
 	 * @return static
 	 */
-	public static function from($arr, $recursive = true)
+	public static function from($arr, $recursive = TRUE)
 	{
 		$obj = new static;
 		foreach ($arr as $key => $value) {
 			if ($recursive && is_array($value)) {
-				$obj->$key = static::from($value, true);
+				$obj->$key = static::from($value, TRUE);
 			} else {
 				$obj->$key = $value;
 			}
@@ -61,7 +61,7 @@ class ArrayHash extends \stdClass implements \ArrayAccess, \Countable, \Iterator
 	 */
 	public function offsetSet($key, $value)
 	{
-		if (!is_scalar($key)) { // prevents null
+		if (!is_scalar($key)) { // prevents NULL
 			throw new Nette\InvalidArgumentException(sprintf('Key must be either a string or an integer, %s given.', gettype($key)));
 		}
 		$this->$key = $value;
@@ -96,4 +96,5 @@ class ArrayHash extends \stdClass implements \ArrayAccess, \Countable, \Iterator
 	{
 		unset($this->$key);
 	}
+
 }

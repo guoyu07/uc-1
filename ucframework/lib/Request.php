@@ -27,4 +27,9 @@ class Request extends NHRequest
         return self::$_instance;
     }
 
+    private function __clone()
+    {
+        
+    }
+
 }

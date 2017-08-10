@@ -20,5 +20,6 @@ interface ITranslator
 	 * @param  int      plural count
 	 * @return string
 	 */
-	function translate($message, $count = null);
+	function translate($message, $count = NULL);
+
 }

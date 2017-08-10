@@ -13,10 +13,8 @@ use Nette;
 /**
  * Output caching helper.
  */
-class OutputHelper
+class OutputHelper extends Nette\Object
 {
-	use Nette\SmartObject;
-
 	/** @var array */
 	public $dependencies;
 
@@ -37,14 +35,16 @@ class OutputHelper
 
 	/**
 	 * Stops and saves the cache.
+	 * @param  array  dependencies
 	 * @return void
 	 */
-	public function end(array $dependencies = null)
+	public function end(array $dependencies = NULL)
 	{
-		if ($this->cache === null) {
+		if ($this->cache === NULL) {
 			throw new Nette\InvalidStateException('Output cache has already been saved.');
 		}
 		$this->cache->save($this->key, ob_get_flush(), (array) $dependencies + (array) $this->dependencies);
-		$this->cache = null;
+		$this->cache = NULL;
 	}
+
 }
