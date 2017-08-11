@@ -2,6 +2,7 @@
 
 namespace ucframework\lib;
 
+use Exception;
 use ucframework\lib\Config;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RequestContext;
@@ -54,13 +55,31 @@ class Router
 
     public function generateUrl($path, $param = [])
     {
+        $scripturl = get_script_path();
+        $config = Config::getInstance()->get('config');
+        if (!$config['url']['rewrite'])
+        {
+            $scripturl .= $config['bootstarp'] . '/';
+        }
         try
         {
             $url = $this->_generator->generate($path, $param);
-            dump($url);
+            return $scripturl . ltrim($url, '/');
         } catch (Exception $ex)
         {
-            
+            if ($config['url']['pathinfo'])
+            {
+                $get = '';
+                foreach ($param as $k => $p)
+                {
+                    $get .= $k . '/' . $p . '/';
+                }
+                return $scripturl . trim($path, '/') . '/' . $get;
+            } else
+            {
+                $mca = explode('/', trim($path, '/'));
+                return rtrim($scripturl, '/') . '?m=' . $mca[0] . '&c=' . $mca[1] . '&a=' . $mca[2] . '&' . http_build_query($param);
+            }
         }
     }
 
@@ -70,15 +89,15 @@ class Router
         try
         {
             $parameters = $this->_matcher->match($url);
-            $actions = explode('/', $parameters['path']);
+            $mca = explode('/', $parameters['path']);
             unset($parameters['path']);
             unset($parameters['_route']);
             foreach ($parameters as $k => $p)
             {
                 $_GET[$k] = $p;
             }
-            return $actions;
-        } catch (ResourceNotFoundException $ex)
+            return $mca;
+        } catch (Exception $ex)
         {
 
             return $this->getNormalUrl();

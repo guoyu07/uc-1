@@ -9,6 +9,7 @@ namespace ucframework;
 use Exception;
 use Whoops\Run;
 use ucframework\lib\Router;
+use ucframework\db\DatabaseManage;
 use Whoops\Handler\PrettyPageHandler;
 
 defined('DS') or define('DS', DIRECTORY_SEPARATOR);
@@ -36,14 +37,14 @@ class Bootstrap
 
         DatabaseManage::register();
         $router = Router::getInstance();
-        $actions = $router->matchUrl();
-        if (in_array($actions[0], ['runtime', 'template','model','components']))
+        $mca = $router->matchUrl();
+        if (in_array($mca[0], ['runtime', 'template', 'model', 'components']))
         {
             throw new Exception('连接地址不正确');
         }
-        define('MODULE_NAME', $actions[0]);
-        define('CONTROLLER_NAME', $actions[1]);
-        define('ACTION_NAME', $actions[2]);
+        define('MODULE_NAME', $mca[0]);
+        define('CONTROLLER_NAME', $mca[1]);
+        define('ACTION_NAME', $mca[2]);
         $controller = '\\app\\' . MODULE_NAME . '\\controller\\' . ucfirst(CONTROLLER_NAME);
         $ctrObject = new $controller();
         $methor = ACTION_NAME;

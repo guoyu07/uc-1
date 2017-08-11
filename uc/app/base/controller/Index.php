@@ -9,6 +9,8 @@ class Index extends Controller
 
     public function index()
     {
+        dump((new \Nette\Http\Request(new \Nette\Http\UrlScript()))->getCookies());
+        die;
         $this->fetch();
     }
 
@@ -16,9 +18,6 @@ class Index extends Controller
     {
         $res = \app\model\Area::first();
         dump($res->id);
-        
     }
-    
-    
 
 }

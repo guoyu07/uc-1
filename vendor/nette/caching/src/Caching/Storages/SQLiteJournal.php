@@ -14,8 +14,10 @@ use Nette\Caching\Cache;
 /**
  * SQLite based journal.
  */
-class SQLiteJournal extends Nette\Object implements IJournal
+class SQLiteJournal implements IJournal
 {
+	use Nette\SmartObject;
+
 	/** @string */
 	private $path;
 
@@ -26,7 +28,7 @@ class SQLiteJournal extends Nette\Object implements IJournal
 	/**
 	 * @param  string
 	 */
-	public function __construct($path = ':memory:')
+	public function __construct($path)
 	{
 		$this->path = $path;
 	}
@@ -67,7 +69,7 @@ class SQLiteJournal extends Nette\Object implements IJournal
 	 * Writes entry information into the journal.
 	 * @param  string
 	 * @param  array
-	 * @return bool
+	 * @return void
 	 */
 	public function write($key, array $dependencies)
 	{
@@ -93,15 +95,13 @@ class SQLiteJournal extends Nette\Object implements IJournal
 		}
 
 		$this->pdo->exec('COMMIT');
-
-		return TRUE;
 	}
 
 
 	/**
 	 * Cleans entries from journal.
 	 * @param  array
-	 * @return array|NULL  removed items or NULL when performing a full cleanup
+	 * @return array|null  removed items or null when performing a full cleanup
 	 */
 	public function clean(array $conditions)
 	{
@@ -116,7 +116,7 @@ class SQLiteJournal extends Nette\Object implements IJournal
 				COMMIT;
 			');
 
-			return NULL;
+			return null;
 		}
 
 		$unions = $args = [];
@@ -154,5 +154,4 @@ class SQLiteJournal extends Nette\Object implements IJournal
 
 		return $keys;
 	}
-
 }
